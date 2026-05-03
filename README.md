@@ -1,7 +1,7 @@
 # 🔍 Audit-AI · Prototip d'Auditoria Intel·ligent
 
 > **Demostració pràctica de com la IA pot automatitzar i millorar el procés d'auditoria comptable.**  
-> Desenvolupat com a cas d'ús formatiu per a auditors interns, auditors externs i directors financers (CFO).
+> Desenvolupat com a cas d'ús formatiu per a auditors/es externs interns, controllers i directors/es financers/es (CFO).
 
 ---
 
