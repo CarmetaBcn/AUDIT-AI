@@ -1,0 +1,369 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:var(--color-text-primary);--ink2:var(--color-text-secondary);--ink3:var(--color-text-tertiary);
+  --paper:var(--color-background-primary);--surf:var(--color-background-secondary);--line:var(--color-border-tertiary);
+  --acc:#1b4fa8;--danger:#b91c1c;--warn:#b45309;--ok:#1e7e3e;
+  --acc-bg:#eff6ff;--danger-bg:#fef2f2;--warn-bg:#fffbeb;--ok-bg:#ecfdf5;
+}
+body{font-family:'IBM Plex Mono',monospace;background:transparent;padding:.5rem 0}
+.shell{border:0.5px solid var(--line);border-radius:var(--border-radius-lg);overflow:hidden}
+.topbar{background:#1a1a2e;padding:8px 14px;display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%}
+.tb-title{color:#888;font-size:10px;margin-left:6px;letter-spacing:.06em}
+.tb-badge{margin-left:auto;background:#1b4fa8;color:#ddeeff;font-size:9px;padding:2px 8px;border-radius:4px;letter-spacing:.04em}
+.file-bar{border-bottom:0.5px solid var(--line);padding:8px 14px;display:flex;align-items:center;gap:8px;background:var(--surf)}
+.file-icon{font-size:14px}
+.file-name{font-size:10px;font-weight:500;color:var(--ink)}
+.file-meta{font-size:9px;color:var(--ink3)}
+.file-ok{margin-left:auto;font-size:9px;padding:3px 8px;border-radius:3px;background:var(--ok-bg);color:var(--ok);border:0.5px solid #bbf7d0;font-weight:500}
+.layout{display:grid;grid-template-columns:200px 1fr;min-height:460px}
+.sidebar{border-right:0.5px solid var(--line);padding:12px 10px;background:var(--surf)}
+.sb-lbl{font-size:9px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.co-card{border:0.5px solid var(--line);border-radius:var(--border-radius-md);padding:8px;background:var(--paper);margin-bottom:12px}
+.co-name{font-family:'Fraunces',serif;font-size:12px;font-weight:500;color:var(--ink);line-height:1.3}
+.co-meta{font-size:9px;color:var(--ink3);margin-top:3px;line-height:1.5}
+.mod-btn{width:100%;text-align:left;border:0.5px solid var(--line);background:var(--paper);border-radius:var(--border-radius-md);padding:7px 9px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink2);cursor:pointer;margin-bottom:4px;display:flex;align-items:center;gap:7px;transition:border-color .12s,color .12s}
+.mod-btn:hover{border-color:var(--acc);color:var(--acc)}
+.mod-btn.active{border-color:var(--acc);color:var(--acc);background:var(--acc-bg)}
+.mod-btn .ic{font-size:13px;width:14px;text-align:center}
+.mod-btn .bdg{margin-left:auto;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:500}
+.br{background:#fee2e2;color:#b91c1c}.ba{background:#fef3c7;color:#b45309}
+.bg{background:#dcfce7;color:#15803d}
+.main{display:flex;flex-direction:column}
+.toolbar{border-bottom:0.5px solid var(--line);padding:8px 14px;display:flex;align-items:center;gap:10px;background:var(--paper)}
+.tb-ttl{font-family:'Fraunces',serif;font-size:13px;color:var(--ink);font-weight:500;flex:1}
+.chips{display:flex;gap:5px}
+.chip{font-size:9px;padding:2px 7px;border-radius:3px;border:0.5px solid var(--line);color:var(--ink3);background:var(--surf)}
+.run-btn{background:var(--acc);color:#fff;border:none;border-radius:var(--border-radius-md);padding:6px 13px;font-family:'IBM Plex Mono',monospace;font-size:10px;cursor:pointer;display:flex;align-items:center;gap:5px;letter-spacing:.03em;transition:opacity .12s;white-space:nowrap}
+.run-btn:hover:not(:disabled){opacity:.85}
+.run-btn:disabled{opacity:.4;cursor:not-allowed}
+.sp{width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.run-btn.loading .sp{display:block}
+.run-btn.loading .bt{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.content{flex:1;padding:14px;overflow-y:auto;max-height:400px}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:240px;gap:6px;color:var(--ink3)}
+.empty-ic{font-size:28px;opacity:.3}
+.empty-tx{font-size:11px;letter-spacing:.04em;text-align:center;line-height:1.7}
+.api-log{border:0.5px solid var(--line);border-radius:var(--border-radius-md);background:#0d1117;padding:10px 12px;margin-bottom:12px;font-size:9px;line-height:1.9}
+.lg{color:#8b949e}.k{color:#79c0ff}.v{color:#a5d6ff}.s{color:#7ee787}.w{color:#f0883e}
+.res-block{border:0.5px solid var(--line);border-radius:var(--border-radius-md);overflow:hidden;margin-bottom:10px}
+.res-hdr{padding:7px 11px;border-bottom:0.5px solid var(--line);display:flex;align-items:center;gap:7px;background:var(--paper);flex-wrap:wrap}
+.res-ttl{font-size:10px;font-weight:500;color:var(--ink)}
+.sev{font-size:8px;padding:2px 6px;border-radius:3px;font-weight:500;letter-spacing:.05em}
+.sev.cr{background:#fee2e2;color:#b91c1c}
+.sev.mi{background:#fef3c7;color:#b45309}
+.sev.in{background:var(--acc-bg);color:var(--acc)}
+.sev.ok{background:#dcfce7;color:#15803d}
+.res-body{padding:10px 12px;font-size:11px;color:var(--ink2);line-height:1.75;background:var(--surf)}
+.res-body p{margin-bottom:5px}
+.mtag{font-family:'IBM Plex Mono',monospace;background:var(--paper);border:0.5px solid var(--line);padding:1px 4px;border-radius:3px;font-size:9px;color:var(--ink)}
+.cur{display:inline-block;width:6px;height:11px;background:var(--acc);margin-left:2px;animation:blink .7s step-end infinite;vertical-align:text-bottom}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.sum-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.stat{background:var(--surf);border:0.5px solid var(--line);border-radius:var(--border-radius-md);padding:9px;text-align:center}
+.stat-n{font-family:'Fraunces',serif;font-size:20px;font-weight:300;color:var(--ink)}
+.stat-n.r{color:var(--danger)}.stat-n.a{color:var(--warn)}.stat-n.b{color:var(--acc)}
+.stat-l{font-size:8px;color:var(--ink3);letter-spacing:.07em;margin-top:1px}
+.footer{border-top:0.5px solid var(--line);padding:7px 14px;display:flex;align-items:center;background:var(--surf)}
+.mdot{width:6px;height:6px;border-radius:50%;background:#22c55e}
+.mtag2{font-size:9px;color:var(--ink3);display:flex;align-items:center;gap:4px}
+.tok{margin-left:auto;font-size:9px;color:var(--ink3)}
+hr.div{border:none;border-top:0.5px solid var(--line);margin:8px 0}
+</style>
+
+<div class="shell">
+  <div class="topbar">
+    <div class="dot" style="background:#ff5f57"></div>
+    <div class="dot" style="background:#ffbd2e"></div>
+    <div class="dot" style="background:#28c840"></div>
+    <span class="tb-title">audit-ai · prototip funcional · dades reals</span>
+    <span class="tb-badge">claude-sonnet-4-20250514 · simulat</span>
+  </div>
+
+  <div class="file-bar">
+    <span class="file-icon">📊</span>
+    <div>
+      <div class="file-name">NordBrix_Dossier_Auditoria_2025.xlsx</div>
+      <div class="file-meta">6 fulls · 157 fórmules · Exercici 2025 · NordBrix Solutions, S.L.</div>
+    </div>
+    <span class="file-ok">✓ fitxer carregat</span>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sb-lbl">Empresa</div>
+      <div class="co-card">
+        <div class="co-name">NordBrix Solutions, S.L.</div>
+        <div class="co-meta">Exercici 2025<br>Distribució materials<br>CNAE 4673 · B-08319274</div>
+      </div>
+      <div class="sb-lbl">Mòduls d'anàlisi</div>
+      <button class="mod-btn active" data-mod="balanc" onclick="selMod(this)"><span class="ic">⊞</span>Balanç<span class="bdg br">3</span></button>
+      <button class="mod-btn" data-mod="pyg" onclick="selMod(this)"><span class="ic">≈</span>P&amp;G<span class="bdg br">3</span></button>
+      <button class="mod-btn" data-mod="amort" onclick="selMod(this)"><span class="ic">◫</span>Amortitzacions<span class="bdg br">4</span></button>
+      <button class="mod-btn" data-mod="clients" onclick="selMod(this)"><span class="ic">◈</span>Clients<span class="bdg ba">3</span></button>
+      <button class="mod-btn" data-mod="prov" onclick="selMod(this)"><span class="ic">◉</span>Proveïdors<span class="bdg ba">3</span></button>
+      <button class="mod-btn" data-mod="banc" onclick="selMod(this)"><span class="ic">⊟</span>Conciliació<span class="bdg br">4</span></button>
+      <button class="mod-btn" data-mod="global" onclick="selMod(this)"><span class="ic">★</span>Informe global<span class="bdg bg">∑</span></button>
+    </div>
+
+    <div class="main">
+      <div class="toolbar">
+        <span class="tb-ttl" id="tb-ttl">Balanç de Situació</span>
+        <div class="chips">
+          <span class="chip" id="chip-r">48 files · 4 col</span>
+          <span class="chip" id="chip-s">full 1/6</span>
+        </div>
+        <button class="run-btn" id="run-btn" onclick="runAnalysis()">
+          <div class="sp"></div><span class="bt">▶ Analitzar</span>
+        </button>
+      </div>
+      <div class="content" id="content">
+        <div class="empty">
+          <div class="empty-ic">⊞</div>
+          <div class="empty-tx">Fitxer 2025 carregat correctament.<br>Selecciona un mòdul i prem "Analitzar".</div>
+        </div>
+      </div>
+      <div class="footer">
+        <span class="mtag2"><span class="mdot"></span><span id="st-txt">fitxer real carregat · NordBrix 2025</span></span>
+        <span class="tok" id="tok-out"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const MODS={
+  balanc:{title:"Balanç de Situació",rows:"48 files · 4 col",sheet:"full 1/6",resp:`**Anàlisi del Balanç de Situació — NordBrix Solutions, S.L. — 31/12/2025**
+
+Lectura del fitxer NordBrix_Dossier_Auditoria_2025.xlsx · full "1. Balanç de Situació":
+
+1. [CRÍTICA] **QUADRATURA NO TANCA: diferència de 532.950 €.**
+El full detecta Actiu (1.589.870 €) – (Passiu + PN) (1.056.920 €) = 532.950 €. Això indica un error estructural greu al full: el Passiu No Corrent i el Passiu Corrent no sumen correctament el total de Passiu i PN. Requereix revisió urgent de les fórmules del document.
+
+2. [CRÍTICA] **Compte 475 – IVA creditor (24.380 €) no concilia amb el model 390 anual.**
+Diferència detectada al full: 1.840 €. Risc fiscal directe: possible liquidació complementària + interessos de demora + sanció mínima del 50%.
+
+3. [CRÍTICA] **Provisió insolvències (c.4309): +106% (18.500 € → 38.200 €).**
+Increment molt significatiu. El full indica diferència de 10 € entre provisió calculada (38.210 €) i comptabilitzada (38.200 €). Revisar criteri aplicat (full 4/6).
+
+4. [MITJANA] **Amortització acumulada material (c.281): –198.460 €.**
+L'increment respecte al 2024 (–164.820 €) és de 33.640 €, inferior als 60.672 € del quadre d'amortitzacions (full 3/6). Diferència de 27.032 € pendent de conciliar.
+
+5. [INFORMATIVA] **Tresoreria: 94.320 € (2025) vs. 118.640 € (2024), –20,5%.**
+Reducció significativa. Contrastar amb la conciliació bancària (full 6/6).`},
+
+  pyg:{title:"Compte de P&G",rows:"52 files · 4 col",sheet:"full 2/6",resp:`**Anàlisi del Compte de P&G — NordBrix Solutions, S.L. — Exercici 2025**
+
+Lectura del fitxer NordBrix_Dossier_Auditoria_2025.xlsx · full "2. Compte de P&G":
+
+1. [CRÍTICA] **EBIT i Resultat net incorrectes: error de fórmula al full.**
+El full mostra EBIT = 2.532.700 € i Resultat net = 2.483.760 €, que corresponen a la suma d'Ingressos + Despeses (sense signe negatiu) en lloc de la diferència. L'EBIT real calculable: Ingressos 2.103.000 € – Despeses explotació 1.715.800 € ≈ 387.200 €. Error crític de fórmula al document.
+
+2. [CRÍTICA] **Tipus efectiu IS: 29,7% vs. 25% nominal.**
+IS corrent declarat: 28.480 €. Sobre el BAI real (~369.380 €) el tipus efectiu és ~7,7%, cosa que tampoc concorda. Cal elaborar conciliació resultat comptable – base imposable per determinar la liquidació correcta.
+
+3. [CRÍTICA] **Compte 610 – Variació existències: signe invers vs. exercici anterior.**
+2024: +32.100 € → 2025: –85.520 €. Verificar coherència amb l'acta d'inventari físic. L'existència de 498.320 € al balanç confirma increment, però el signe de la variació ha de ser positiu si les existències augmenten.
+
+4. [MITJANA] **Dotació provisió insolvències (c.694): +190% (6.800 € → 19.700 €).**
+Increment molt superior al creixement de vendes (+12,5%). Revisar criteri i contrastar amb full 4/6.
+
+5. [INFORMATIVA] **Compte 650 – Deteriorament existències: 4.200 € (novetat 2025, era 0).**
+Primera aparició. Identificar les referències afectades i documentar el criteri VNR aplicat.`},
+
+  amort:{title:"Llibre d'Amortitzacions",rows:"15 actius · 10 col",sheet:"full 3/6",resp:`**Anàlisi del Quadre d'Amortitzacions — NordBrix Solutions, S.L. — 2025**
+
+Lectura del fitxer NordBrix_Dossier_Auditoria_2025.xlsx · full "3. Llibre Amortitzacions":
+
+1. [CRÍTICA] **Instal·lació anti-incendis (28.900 €): quota 2025 (2.890 €) NO registrada al c.681.**
+El full indica explícitament: "⚠ Amort. 2025 no comptabilitzada". Ajust necessari: Deure 681 / Haver 281 → 2.890 €. Risc: resultat sobrevaluat + pèrdua de deducció fiscal.
+
+2. [CRÍTICA] **Diferència quadre vs. P&G: total quadre 60.672 € vs. c.681+c.680 (33.640 + 14.000 = 47.640 €) = 13.032 € no registrats.**
+A més de l'anti-incendis (2.890 €), hi ha una diferència addicional de 10.142 € sense explicació. Procediment urgent: revisar actiu per actiu.
+
+3. [MITJANA] **Camió MAN TGS (48.000 €, rèting financer): verificar NIIF 16.**
+Data alta: 01/01/2024. Primera amortització 2025: 6.000 €. Confirmar data inici ús efectiu i correcta separació quota capital / interessos del rèting.
+
+4. [MITJANA] **PC lot 2025 (9.500 €, alta setembre 2025): quota any 989 €.**
+El full marca "⚠ Alta 2025 — amortitzar des de setembre". Verificar si el cost capitalitzat inclou IVA no deduïble (prorrata).
+
+5. [INFORMATIVA] **PC lot 2022 (8.200 €): totalment amortitzat a 31/12/2025 (VNC = 0 €).**
+El full confirma "⚠ Vida útil 4 anys — totalment amortitzat". Verificar si l'actiu continua en ús i informar a la memòria.`},
+
+  clients:{title:"Llibre de Clients",rows:"15 clients · 11 col",sheet:"full 4/6",resp:`**Anàlisi del Risc de Crèdit — Llibre de Clients — NordBrix Solutions, S.L. — 2025**
+
+Lectura del fitxer NordBrix_Dossier_Auditoria_2025.xlsx · full "4. Llibre de Clients":
+
+Saldo brut total: 387.940 € | Provisió comptabilitzada: 38.200 € | Provisió calculada al full: 38.210 €
+
+1. [CRÍTICA] **C014 Promotora Besòs 2020, S.L. — 18.100 € en concurs de creditors.**
+Provisió actual: 18.100 € (100%). Obtenir: auto d'admissió del concurs + certificat del síndic sobre expectatives de cobrament. Deduïbilitat fiscal art. 13.1 LIS: compleix (>6 mesos, procediment judicial).
+
+2. [CRÍTICA] **C009 Rehabilitació Gòtic, S.L. — 11.200 € possible fallida.**
+Provisió actual: 5.600 € (50%). El full indica "possible fallida". Si el concurs es confirma → provisió 100% → ajust addicional de 5.600 €. Procediment: informe comercial actualitzat + Registre Mercantil.
+
+3. [MITJANA] **Diferència provisió: 38.210 € calculada vs. 38.200 € comptabilitzada = 10 €.**
+El full ho identifica. Materialment irrellevant però cal regularitzar per coherència. Risc latent no cobert: ~11.750 € (C009 al 100%).
+
+4. [INFORMATIVA] **Provisió genèrica C005 (4.900 €) i C006 (1.960 €): NO deduïble fiscalment (art. 13.1 LIS).**
+Total provisió genèrica: 6.860 €. Diferència temporària → registrar actiu per impost diferit: 6.860 € × 25% = 1.715 €.`},
+
+  prov:{title:"Llibre de Proveïdors",rows:"15 proveïdors · 9 col",sheet:"full 5/6",resp:`**Anàlisi de Proveïdors i Compliment Normatiu — NordBrix Solutions, S.L. — 2025**
+
+Lectura del fitxer NordBrix_Dossier_Auditoria_2025.xlsx · full "5. Llibre de Proveïdors":
+
+Saldo total: 386.980 € | TMP global: 43,6 dies (dins el límit legal de 60 dies)
+
+1. [CRÍTICA] **P006 Isover (filial Saint-Gobain): TMP 112 dies — incompliment greu Llei 15/2010.**
+Saldo: 24.100 €. Tot el saldo supera 90 dies. Risc: (a) sancions administratives, (b) informació obligatòria a la memòria (art. 9 Llei 15/2010 i RD 4/2013).
+
+2. [CRÍTICA] **Operació vinculada Saint-Gobain: P004 (55.600 €) + P006 Isover (filial, 24.100 €) = 79.700 €.**
+El full alerta explícitament d'aquesta situació. Si les operacions anuals totals amb el grup superen 250.000 €, cal presentar el model 232 i tenir documentació de preu de transferència.
+
+3. [MITJANA] **P005 Knauf Insulation (TMP 78 d) i P015 Comercial Gràcia (TMP 85 d).**
+Total en incompliment Llei 15/2010: 49.900 € (12,9% del saldo total). Informació obligatòria a la memòria i negociació de condicions dins el límit legal.
+
+4. [INFORMATIVA] **TMP global: 43,6 dies — conforme al límit de 60 dies.**
+La mitjana global és acceptable, però tres proveïdors individuals superen el límit. La memòria ha de desglossar el TMP per trams de venciment.`},
+
+  banc:{title:"Conciliació Bancària",rows:"12 partides · 4 col",sheet:"full 6/6",resp:`**Anàlisi de la Conciliació Bancària — CEM *4821 — 31/12/2025**
+
+Lectura del fitxer NordBrix_Dossier_Auditoria_2025.xlsx · full "6. Conciliació Bancària":
+
+Extracte bancari: 97.840,22 € | Saldo comptable c.572: 94.320,00 €
+Extracte ajustat: 94.195,57 € | Comptable ajustat: 94.315,78 €
+**Diferència pendent: –120,21 € → NO QUADRA**
+
+1. [CRÍTICA] **Cobrament duplicat C007 Constructora Pirineus (22/12/2025): –1.191,64 €.**
+El full identifica explícitament: "INCIDÈNCIA GREU: Cobrament registrat dues vegades el 22/12". Ajust urgent: Deure 430 (Constructora Pirineus) / Haver 572 → 1.191,64 €. Impacte: tresoreria sobrevaluada i saldo client infravalorat.
+
+2. [CRÍTICA] **Diferència residual no resolta: –120,21 €.**
+Un cop aplicats tots els ajustos identificats, la conciliació no tanca. Causa probable: alguna partida no identificada en el tram 22-31/12. Procediment: revisar moviment a moviment els 10 darrers dies de desembre.
+
+3. [MITJANA] **Ingrés de 1.000 € (29/12/2025) sense referència ni ordenant identificat.**
+El full marca explícitament "pendent classificar". Risc PBC: qualsevol ingrés sense identificar requereix diligència deguda. Sol·licitar al banc identificació de l'ordenant.
+
+4. [INFORMATIVA] **Comissió bancària 4T (–124,50 €) i interessos no registrats (+187,42 €).**
+Ajustos de periodificació pendents. Impacte net al resultat: +62,92 €. Regularitzar abans del tancament definitiu.`},
+
+  global:{title:"Informe Global d'Auditoria",rows:"tots els fulls",sheet:"agregat · 6 mòduls",resp:`**INFORME EXECUTIU D'AUDITORIA — NordBrix Solutions, S.L. — Exercici 2025**
+
+Basat en la lectura directa de NordBrix_Dossier_Auditoria_2025.xlsx (6 fulls, 157 fórmules):
+
+---
+
+**RESUM EXECUTIU**
+
+L'auditoria ha identificat 19 incidències en 6 àrees. Destaca un error estructural nou al fitxer 2025:
+
+· ERROR CRÍTIC NOU: Fórmules incorrectes al P&G (EBIT i Resultat net sobreestimats per ~2,1M€)
+· Quadratura balanç no tanca: diferència de 532.950 € al full
+· Amortització anti-incendis no registrada: –2.890 € al resultat real
+· Subprovisió clients potencial (C009 al 100%): –5.600 € addicionals
+· Cobrament duplicat C007: –1.191,64 € (tresoreria / clients)
+· IVA c.475 no concilia model 390: 1.840 € contingència fiscal
+**Impacte sobre resultat real: errors de fórmula fan infiable el resultat declarat → revisió completa necessària**
+
+---
+
+**3 INCIDÈNCIES CRÍTIQUES — PRIORITAT MÀXIMA**
+
+1. [CRÍTICA] **Errors de fórmula al P&G: EBIT i Resultat net incorrectes.**
+El EBIT declarat (2.532.700 €) és la suma d'ingressos + despeses sense aplicar signe. EBIT real estimat: ~387.200 €. Requereix reconstrucció del full.
+
+2. [CRÍTICA] **Quadratura del balanç: diferència de 532.950 €.**
+TOTAL ACTIU (1.589.870 €) ≠ TOTAL PASSIU + PN (1.056.920 €). Error de fórmula o de referència al full del balanç.
+
+3. [CRÍTICA] **Cobrament duplicat C007 (–1.191,64 €) i diferència conciliació (–120,21 €).**
+Dos errors independents a la tresoreria que requereixen assentament de rectificació urgent.
+
+---
+
+**OPINIÓ PRELIMINAR: Desfavorable (amb reserva)** — Els errors de fórmula al P&G i la no-quadratura del balanç fan que els comptes anuals, en el seu estat actual, no reflecteixin la imatge fidel de l'empresa. Abans d'emetre opinió definitiva cal reconstruir les fórmules i verificar que els saldos definitius son correctes.
+
+---
+
+**RECOMANACIONS**
+
+· Reconstruir les fórmules del P&G (EBIT i Resultat net) amb signe correcte a les despeses
+· Revisar les fórmules de suma del passiu al balanç fins que la quadratura sigui 0
+· Emetre assentament de rectificació del cobrament duplicat C007 abans del tancament`}
+};
+
+let curMod='balanc';
+function selMod(btn){
+  document.querySelectorAll('.mod-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');curMod=btn.dataset.mod;
+  const m=MODS[curMod];
+  document.getElementById('tb-ttl').textContent=m.title;
+  document.getElementById('chip-r').textContent=m.rows;
+  document.getElementById('chip-s').textContent=m.sheet;
+  document.getElementById('content').innerHTML='<div class="empty"><div class="empty-ic">⊞</div><div class="empty-tx">Prem "Analitzar" per iniciar l\'anàlisi.</div></div>';
+  document.getElementById('tok-out').textContent='';
+}
+async function runAnalysis(){
+  const btn=document.getElementById('run-btn');
+  const cnt=document.getElementById('content');
+  btn.classList.add('loading');btn.disabled=true;
+  document.getElementById('st-txt').textContent='llegint NordBrix_Dossier_Auditoria_2025.xlsx…';
+  const m=MODS[curMod];
+  const inTok=340+Math.floor(Math.random()*80);
+  const words=m.resp.split(' ');
+  const outTok=Math.floor(words.length*1.3);
+  cnt.innerHTML=`<div class="api-log" id="alog"><span class="k">POST</span> <span class="v">https://api.anthropic.com/v1/messages</span></div><div id="sa"></div>`;
+  const log=document.getElementById('alog');
+  const lines=[
+    `<br><span class="lg"><span class="k">model</span>: <span class="s">"claude-sonnet-4-20250514"</span></span>`,
+    `<br><span class="lg"><span class="k">input</span>: <span class="v">NordBrix_Dossier_Auditoria_2025.xlsx</span> → <span class="s">${m.sheet}</span> · <span class="v">${m.rows}</span></span>`,
+    `<br><span class="lg"><span class="k">parsing</span>: <span class="s">excel → JSON estructurat · exercici 2025</span></span>`,
+    `<br><span class="lg"><span class="k">prompt_tokens</span>: <span class="w">${inTok}</span> · <span class="k">stream</span>: <span class="s">true</span> · <span class="k">status</span>: <span class="s">200 OK</span></span>`,
+  ];
+  for(const l of lines){await delay(200+Math.random()*110);log.innerHTML+=l;}
+  await delay(280);
+  const sa=document.getElementById('sa');
+  sa.innerHTML=`<div class="res-block"><div class="res-hdr"><span class="res-ttl">${m.title} · exercici 2025 · anàlisi IA</span></div><div class="res-body" id="st-body"><span class="cur"></span></div></div>`;
+  document.getElementById('st-txt').textContent='rebent resposta en streaming…';
+  let full='';
+  for(let i=0;i<words.length;i++){
+    full+=(i===0?'':' ')+words[i];
+    document.getElementById('st-body').innerHTML=renderTxt(full)+'<span class="cur"></span>';
+    await delay(15+Math.random()*20);
+    if(i%40===0) document.getElementById('st-body').scrollIntoView({behavior:'smooth',block:'end'});
+  }
+  document.getElementById('st-body').innerHTML=renderTxt(full);
+  renderSum(full,sa);
+  document.getElementById('tok-out').textContent=`↑${inTok} tokens entrada · ↓${outTok} sortida`;
+  document.getElementById('st-txt').textContent='anàlisi completada · fitxer 2025';
+  btn.classList.remove('loading');btn.disabled=false;
+}
+function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+function renderTxt(txt){
+  return txt.split('\n').map(line=>{
+    if(!line.trim()) return '<br>';
+    return '<p>'+line.trim()
+      .replace(/\[CRÍTICA\]/g,'<span class="sev cr">CRÍTICA</span>')
+      .replace(/\[MITT?JANA\]/g,'<span class="sev mi">MITJANA</span>')
+      .replace(/\[INFORMATIVA\]/g,'<span class="sev in">INFORMATIVA</span>')
+      .replace(/---/g,'<hr class="div">')
+      .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+      .replace(/`([^`]+)`/g,'<span class="mtag">$1</span>')
+      +'</p>';
+  }).join('');
+}
+function renderSum(txt,container){
+  const c=(txt.match(/CRÍTICA/gi)||[]).length;
+  const m=(txt.match(/MITT?JANA/gi)||[]).length;
+  const i=(txt.match(/INFORMATIVA/gi)||[]).length;
+  const t=c+m+i;if(!t)return;
+  const bar=document.createElement('div');
+  bar.className='sum-bar';
+  bar.innerHTML=`<div class="stat"><div class="stat-n">${t}</div><div class="stat-l">TOTAL</div></div><div class="stat"><div class="stat-n r">${c}</div><div class="stat-l">CRÍTIQUES</div></div><div class="stat"><div class="stat-n a">${m}</div><div class="stat-l">MITJANES</div></div><div class="stat"><div class="stat-n b">${i}</div><div class="stat-l">INFORMATIVES</div></div>`;
+  container.insertBefore(bar,container.firstChild);
+}
+document.getElementById('chip-r').textContent=MODS['balanc'].rows;
+document.getElementById('chip-s').textContent=MODS['balanc'].sheet;
+</script>
